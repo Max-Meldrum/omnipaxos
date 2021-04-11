@@ -56,6 +56,8 @@ where
     num_nodes: usize,
     // pub log: KompactLogger, // TODO provide kompact independent log when used as a library
     max_inflight: usize,
+    #[cfg(feature = "batch_accept")]
+    batch_count: usize
 }
 
 impl<R, S, P> Paxos<R, S, P>
@@ -129,9 +131,16 @@ where
             num_nodes,
             // log,
             max_inflight,
+            #[cfg(feature = "batch_accept")]
+            batch_count: 0
         };
         paxos.storage.set_promise(n_leader);
         paxos
+    }
+
+    #[cfg(feature = "batch_accept")]
+    pub fn get_batch_count(&self) -> usize {
+        self.batch_count
     }
 
     pub fn get_current_leader(&self) -> u64 {
@@ -394,6 +403,9 @@ where
                             PaxosMsg::FirstAccept(f) => f.entries.push(entry.clone()),
                             _ => panic!("Not Accept or AcceptSync when batching"),
                         }
+                        #[cfg(feature = "batch_accept")] {
+                            self.batch_count += 1;
+                        }
                     }
                     _ => {
                         let acc =
@@ -442,6 +454,9 @@ where
                             }
                             PaxosMsg::FirstAccept(f) => f.entries.append(entries.clone().as_mut()),
                             _ => panic!("Not Accept or AcceptSync when batching"),
+                        }
+                        #[cfg(feature = "batch_accept")] {
+                            self.batch_count += 1;
                         }
                     }
                     _ => {
