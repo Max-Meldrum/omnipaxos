@@ -2,7 +2,8 @@
 members = [
     "omnipaxos_core",
     "omnipaxos_storage",
-    "examples/kv_store"
+    "examples/kv_store",
+    "demo"
 ]
 
 [profile.release]

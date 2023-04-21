@@ -3,6 +3,7 @@
 /log
 Cargo.lock
 omnipaxos_storage/storage
+/demo/dist
 
 # IntelliJ
 *.iml
